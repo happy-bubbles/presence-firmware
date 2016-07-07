@@ -22,7 +22,7 @@ There is more information about how the presence detection system works at https
 4. You'll now be at the Happy Bubbles config screen! You can change the hostname of the device here.
 5. On the left side with the navigation bar, go to "WiFi Setup". It will populate a bunch of wifi access points it can see. Find yours and type in the password. You should see it get an IP address from it, and now you're connected!
 
-#### 5. Make it hit your server
+#### 2. Make it hit your server
 1. From the same config mode, go to "MQTT Setup". In there, you can set which MQTT server the device should talk to. 
 
 ### Credits
