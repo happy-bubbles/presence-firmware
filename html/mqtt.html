@@ -1,0 +1,98 @@
+  <div id="main">
+    <div class="header">
+      <h1>MQTT</h1>
+    </div>
+
+    <div class="content">
+			<div class="pure-g">
+        <div class="pure-u-1 pure-u-md-1-2">
+          <div class="card">
+            <h1>MQTT
+              <div id="mqtt-spinner" class="spinner spinner-small"></div>
+            </h1>
+            <form action="#" id="mqtt-form" class="pure-form" hidden>
+              <legend>MQTT server settings</legend>
+              <div class="pure-form-stacked">
+                <label>Server hostname or IP</label>
+                <input type="text" name="mqtt-host"/>
+                <label>Server port</label>
+                <input type="text" name="mqtt-port"/>
+                <label>Client ID</label>
+                <input type="text" name="mqtt-client-id"/>
+                <label>Client Timeout (seconds)</label>
+                <input type="text" name="mqtt-timeout" />
+                <label>Keep Alive Interval (seconds)</label>
+                <input type="text" name="mqtt-keepalive" />
+                <label>Username</label>
+                <input type="text" name="mqtt-username"/>
+                <label>Password</label>
+                <input type="password" name="mqtt-password"/>
+                <input type="checkbox" name="led_output"/>
+                <label for="led_output">Blink LEDs for incoming beacons</label>
+              </div>
+              <button id="mqtt-button" type="submit" class="pure-button button-primary">
+                Update server settings!
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="pure-u-1 pure-u-md-1-2">
+          <div class="card">
+            <h1>Status reporting
+              <div id="mqtt-status-spinner" class="spinner spinner-small"></div>
+            </h1>
+            <form action="#" id="mqtt-status-form" class="pure-form" hidden>
+              <div class="form-horizontal">
+                <input type="checkbox" name="mqtt-status-enable"/>
+                <label>Enable status reporting via MQTT</label>
+              </div>
+              <br>
+              <div class="pure-form-stacked">
+                <label>Status topic</label>
+                <input type="text" name="mqtt-status-topic"/>
+                Message: <tt id="mqtt-status-value"></tt>
+                <div class="popup">MQTT topic to which status message is sent</div>
+              </div>
+              <button id="mqtt-status-button" type="submit" class="pure-button button-primary">
+                Update status settings!
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+			<div class="pure-g">
+        <div class="pure-u-1"><div class="card">
+          <p>The MQTT support will send Bluetooth Low Energy advertisements detected by the Happy Bubbles BLE module to the selected MQTT server
+					over QoS 0 type message.
+					</p>
+					<p>
+					Happy Bubbles will publish all advertisments it sees to the MQTT topic: "happy-bubbles/ble/&lt;the-hostname&gt;/raw/&lt;the-bluetooth-MAC-address&gt;"
+					<br>
+					<strong>Eddystone beacons: </strong> if the advertisment looks to be in Eddystone format, it will also be published to the topic: "happy-bubbles/ble/&lt;the-hostname&gt;/eddystone/&lt;the-Eddystone-namespace&gt;"
+					<br>
+					<strong>iBeacons: </strong> if the advertisment looks to be in iBeacon format, it will also be published to the topic: "happy-bubbles/ble/&lt;the-hostname&gt;/ibeacon/&lt;the-iBeacon-UUID&gt;"
+					</p>
+					<p>
+						All of the MQTT payloads will be in JSON format and will have the relevant info for the type of advertisement detected. You can see the specifics of those <a href="https://www.happybubbles.tech/ble/format">here</a>. 
+					</p>
+          <p>The MQTT support is in the form of a built-in client that connects to a server
+          using parameters set above and stored in Happy Bubble's flash settings. This allows 
+          the module to take care of connection parameters and disconnect/reconnect operations.</p>
+          <p>The MQTT client also supports sending periodic status messages about the Happy Bubbles board itself,
+          including WiFi RSSI, and free heap memory.</p>
+        </div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="mqtt.js"></script>
+<script type="text/javascript">
+onLoad(function() {
+  fetchMqtt();
+  bnd($("#mqtt-form"), "submit", changeMqtt);
+  bnd($("#mqtt-status-form"), "submit", changeMqttStatus);
+});
+</script>
+</body></html>

@@ -1,0 +1,78 @@
+  <div id="main">
+    <div class="header">
+      <div><img src="hippo.svg" height="64"></div>
+      <h1 style="margin-top:0">Happy Bubbles BLE</h1>
+      <h2 id="version"></h2>
+    </div>
+
+    <div class="content">
+      <div class="pure-g">
+        <!-- LEFT COLUMN -->
+        <div class="pure-u-1 pure-u-md-1-2">
+          <div class="card">
+            <h1>System overview</h1>
+            <div id="wifi-spinner" class="spinner spinner-small"></div>
+            <table id="wifi-table" class="pure-table pure-table-horizontal" hidden><tbody>
+              <tr><td class="popup-target">Hostname</td><td>
+                <div class="click-to-edit system-name">
+                  <span class="edit-off"></span>
+                  <input class="edit-on" maxlength=31 hidden></input>
+                  <div class="popup">Click to edit!<br>Hostname displayed in menu bar
+                    and used by DHCP and mDNS</div>
+                </div>
+              </td></tr>
+              <tr><td>Network SSID</td><td id="wifi-ssid"></td></tr>
+              <tr><td>WiFi status</td><td id="wifi-status"></td></tr>
+              <tr><td>WiFi address</td><td id="wifi-ip"></td></tr>
+              <tr><td>MQTT status</td><td class="system-mqtt"></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+        <!-- RIGHT COLUMN -->
+        <div class="pure-u-1 pure-u-md-1-2">
+          <div class="card">
+            <h1>System details</h1>
+            <div id="system-spinner" class="spinner spinner-small"></div>
+            <table id="system-table" class="pure-table pure-table-horizontal" hidden><tbody>
+            <tr><td>WiFi mode</td><td id="wifi-mode"></td></tr>
+            <tr><td>WiFi channel</td><td id="wifi-chan"></td></tr>
+            <tr><td>Flash chip ID</td><td>
+              <div>
+                <span class="system-id"></span>
+                <div class="popup pop-left">Common IDs: 4016=4MB, 4014=1MB, 4013=512KB</div>
+              </div>
+            </td></tr>
+            <tr><td>Flash size</td><td>
+              <div>
+                <span class="system-size"></span>
+                <div class="popup pop-left">Size configured into bootloader, must match chip size</div>
+              </div>
+            </td></tr>
+            <tr><td>Current partition</td><td class="system-partition"></td></tr>
+            <tr><td colspan=2 class="popup-target">Description:<br>
+                <div class="click-to-edit system-description">
+                  <span class="edit-off" style="display:block; width:auto;"></span>
+                  <textarea class="edit-on" rows=3 maxlength=127 hidden> </textarea>
+                  <div class="popup">Click to edit!<br>A short description or memo for this Happy Bubbles BLE
+                    module, 128 chars max</div>
+                </div>
+            </td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+      <div class="pure-g">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+onLoad(function() {
+  makeAjaxInput("system", "description");
+  makeAjaxInput("system", "name");
+  getWifiInfo();
+  getSystemInfo();
+});
+</script>
+</body></html>

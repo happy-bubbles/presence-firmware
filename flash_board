@@ -1,0 +1,12 @@
+./ble_board/flash  </dev/null
+X=$?
+
+if [ "$X" -ne "0" ] 
+then
+	echo "BAD NRF FLASH"
+#	exit 1
+fi
+
+read -p "Reset ESP8266 into bootloader mode, then press any key..." 
+
+make flash
