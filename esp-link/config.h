@@ -21,7 +21,7 @@ typedef struct {
            mqtt_timeout,               // MQTT send timeout
            mqtt_clean_session;         // MQTT clean session
   uint16_t mqtt_port, mqtt_keepalive;  // MQTT Host port, MQTT Keepalive timer
-  char     mqtt_host[32], 
+  char     mqtt_host[64], 
            mqtt_clientid[48], 
            mqtt_username[32], 
            mqtt_password[32],
