@@ -1,4 +1,4 @@
-./ble_board/flash  </dev/null
+./ble_module/flash  </dev/null
 X=$?
 
 if [ "$X" -ne "0" ] 
@@ -9,4 +9,5 @@ fi
 
 read -p "Reset ESP8266 into bootloader mode, then press any key..." 
 
+#../esp-open-sdk/esptool/esptool.py --port /dev/ttyUSB0 erase_flash
 make flash

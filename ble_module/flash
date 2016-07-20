@@ -1,2 +1,3 @@
-cd nrf
-openocd -d1 -f x.cfg  -c "gdb_port pipe; init; halt; nrf51 mass_erase; reset; halt; flash write_image erase combined.hex 0; verify_image combined.hex 0; reset; exit;"
+cd ble_module
+#openocd -d1 -f x.cfg  -c "gdb_port pipe; init; halt; nrf51 mass_erase; reset; halt; flash write_image erase combined.hex 0; verify_image combined.hex 0; reset; exit;"
+openocd -d1 -f x.cfg  -c "gdb_port pipe; init; halt; nrf51 mass_erase; reset; halt; flash write_image erase ble_scanner_cr.hex 0; verify_image ble_scanner_cr.hex 0; reset; exit;"

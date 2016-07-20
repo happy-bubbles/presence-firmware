@@ -60,6 +60,7 @@ int ICACHE_FLASH_ATTR cgiGetFirmwareNext(HttpdConnData *connData) {
   httpdStartResponse(connData, 200);
   httpdHeader(connData, "Content-Type", "text/plain");
   httpdHeader(connData, "Content-Length", "9");
+  httpdHeader(connData, "Access-Control-Allow-Origin", "*");
   httpdEndHeaders(connData);
   char *next = id == 1 ? "user1.bin" : "user2.bin";
   httpdSend(connData, next, -1);
@@ -108,6 +109,7 @@ int ICACHE_FLASH_ATTR cgiUploadFirmware(HttpdConnData *connData) {
     DBG("Error %d: %s\n", code, err);
     httpdStartResponse(connData, code);
     httpdHeader(connData, "Content-Type", "text/plain");
+  	httpdHeader(connData, "Access-Control-Allow-Origin", "*");
     //httpdHeader(connData, "Content-Length", strlen(err)+2);
     httpdEndHeaders(connData);
     httpdSend(connData, err, -1);
@@ -166,6 +168,7 @@ int ICACHE_FLASH_ATTR cgiRebootFirmware(HttpdConnData *connData) {
     DBG("Error %d: %s\n", 400, err);
     httpdStartResponse(connData, 400);
     httpdHeader(connData, "Content-Type", "text/plain");
+  	httpdHeader(connData, "Access-Control-Allow-Origin", "*");
     //httpdHeader(connData, "Content-Length", strlen(err)+2);
     httpdEndHeaders(connData);
     httpdSend(connData, err, -1);
@@ -189,6 +192,7 @@ int ICACHE_FLASH_ATTR cgiReset(HttpdConnData *connData) {
   if (connData->conn == NULL) return HTTPD_CGI_DONE; // Connection aborted. Clean up.
 
   httpdStartResponse(connData, 200);
+  httpdHeader(connData, "Access-Control-Allow-Origin", "*");
   httpdHeader(connData, "Content-Length", "0");
   httpdEndHeaders(connData);
 

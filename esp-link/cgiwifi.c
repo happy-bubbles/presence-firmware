@@ -307,9 +307,18 @@ static void ICACHE_FLASH_ATTR resetTimerCb(void *arg) {
       if (m != 1) {
 #ifdef CHANGE_TO_STA
       // We're happily connected, go to STA mode
-      DBG("Wifi got IP. Going into STA mode..\n");
-      wifi_set_opmode(1);
-      os_timer_arm(&resetTimer, RESET_TIMEOUT, 0); // check one more time after switching to STA-only
+			// ONLY DO THIS IF CONFIG IS NOT TRUE!
+			if(!flashConfig.configMode)
+			{
+	      DBG("Wifi got IP. Going into STA mode..\n");
+	      os_printf("CONFIG MODE IS NOT ENABLED SO STA MODE\n");
+  	    wifi_set_opmode(1);
+    	  os_timer_arm(&resetTimer, RESET_TIMEOUT, 0); // check one more time after switching to STA-only
+			}
+			else 
+			{
+	      os_printf("CONFIG MODE ENABLED SO NOT STA MODE\n");
+			}
 #endif
     }
     log_uart(false);
