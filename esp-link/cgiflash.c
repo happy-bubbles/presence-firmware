@@ -137,6 +137,7 @@ int ICACHE_FLASH_ATTR cgiUploadFirmware(HttpdConnData *connData) {
 
   if (connData->post->received == connData->post->len){
     httpdStartResponse(connData, 200);
+  	httpdHeader(connData, "Access-Control-Allow-Origin", "*");
     httpdEndHeaders(connData);
     return HTTPD_CGI_DONE;
   } else {
@@ -178,6 +179,7 @@ int ICACHE_FLASH_ATTR cgiRebootFirmware(HttpdConnData *connData) {
 
   httpdStartResponse(connData, 200);
   httpdHeader(connData, "Content-Length", "0");
+  httpdHeader(connData, "Access-Control-Allow-Origin", "*");
   httpdEndHeaders(connData);
 
   // Schedule a reboot
