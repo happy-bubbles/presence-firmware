@@ -36,6 +36,8 @@ static char ble_is_scan_resp [2];
 static char ble_type [2];
 static char ble_data[100];
 
+static char serial_buffer[200];
+
 char beacon_uuid [33];
 char beacon_major [5];
 char beacon_minor [5];
@@ -165,11 +167,10 @@ void ICACHE_FLASH_ATTR hex2str(char *out, unsigned char *s, size_t len)
 #define ibeacon_include_1 "0201"
 #define ibeacon_include_2 "1aff4c0002"
 
-// callback with a buffer of characters that have arrived on the uart
 void ICACHE_FLASH_ATTR
-bleBridgeUartCb(char *buf, short length)
+process_serial(char *buf)
 {
-	os_printf("********* got serial %d **  %s \n\r", length, buf);
+	os_printf("********* got serial to process %d **  %s \n\r", strlen(buf), buf);
 	char * pch;
 	pch = strtok(buf, "|");
 	int i = 0;
@@ -357,6 +358,33 @@ bleBridgeUartCb(char *buf, short length)
 	//os_printf("send some mqtt for mac %s =====%d===\n", ble_mac_addr, strlen(ble_mac_addr));
 	sendMQTTraw(ble_mac_addr, ble_rssi, ble_is_scan_resp, ble_type, ble_data);
 }
+
+// callback with a buffer of characters that have arrived on the uart
+void ICACHE_FLASH_ATTR
+bleBridgeUartCb(char *buf, short length)
+{
+	//os_printf("********* got serial %d **  %s \n\r", length, buf);
+	// append to serial_buffer
+	strcat(serial_buffer, buf);
+
+	// check if buffer contains a \n or \r, if does, then is end of string and pass it for processing.
+	char * nl = NULL;
+	char * cr = NULL;
+	nl = strchr(serial_buffer, '\n');
+	cr = strchr(serial_buffer, '\r');
+	if(nl != NULL)
+	{
+		if(cr != NULL)
+		{
+			serial_buffer[cr-serial_buffer] = '\0';
+		}
+
+		// pass on for processing
+		process_serial(serial_buffer);
+		// clear the buffer
+		memset(serial_buffer, 0, 200);
+	}	
+}	
 
 //startup connect Timer event
 static void ICACHE_FLASH_ATTR startup_connect_check(void *arg)

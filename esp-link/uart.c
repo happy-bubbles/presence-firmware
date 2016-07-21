@@ -74,7 +74,7 @@ uart_config(uint8 uart_no)
   CLEAR_PERI_REG_MASK(UART_CONF0(uart_no), UART_RXFIFO_RST | UART_TXFIFO_RST);
 
   if (uart_no == UART0) {
-    // Configure RX interrupt conditions as follows: trigger rx-full when there are 127 characters
+    // Configure RX interrupt conditions as follows: trigger rx-full when there are 80 characters
     // in the buffer, trigger rx-timeout when the fifo is non-empty and nothing further has been
     // received for 4 character periods.
     // Set the hardware flow-control to trigger when the FIFO holds 100 characters, although
@@ -83,7 +83,7 @@ uart_config(uint8 uart_no)
     // We do not enable framing error interrupts 'cause they tend to cause an interrupt avalanche
     // and instead just poll for them when we get a std RX interrupt.
     WRITE_PERI_REG(UART_CONF1(uart_no),
-                   ((127 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S) |
+                   ((80 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S) |
                    ((100 & UART_RX_FLOW_THRHD) << UART_RX_FLOW_THRHD_S) |
                    UART_RX_FLOW_EN |
                    (4 & UART_RX_TOUT_THRHD) << UART_RX_TOUT_THRHD_S |
@@ -222,35 +222,16 @@ uart_recvTask(os_event_t *events)
 
     // read a buffer-full from the uart
     uint16 length = 0;
-    uint16 l = 0;
     char buf[128];
-		char in_char;
-		bool did_start = false;
+		memset(buf, 0, 128);
     while ((READ_PERI_REG(UART_STATUS(UART0)) & (UART_RXFIFO_CNT << UART_RXFIFO_CNT_S)) &&
            (length < 128)) {
-			in_char = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
-			length++;
-			//look for beginning | char from BLE peripheral
-			if(in_char == '|') 
-			{
-				did_start = true;
-			}
-			if(did_start)
-			{
-	      buf[l] = in_char;
-				if(buf[l] == '\n' || buf[l] == '\r')
-				{
-					buf[l] = '\0';
-					break;
-				}
-				l++;
-			}
+			buf[length++] = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
     }
     //DBG_UART("%d ix %d\n", system_get_time(), length);
 
     for (int i=0; i<MAX_CB; i++) {
-      //if (uart_recv_cb[i] != NULL) (uart_recv_cb[i])(buf, length);
-      if (uart_recv_cb[i] != NULL && l > 3) (uart_recv_cb[i])(buf, l);
+      if (uart_recv_cb[i] != NULL) (uart_recv_cb[i])(buf, length);
     }
   }
   WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);
