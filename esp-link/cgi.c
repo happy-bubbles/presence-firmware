@@ -208,8 +208,9 @@ int ICACHE_FLASH_ATTR cgiMenu(HttpdConnData *connData) {
         "\"Home\", \"/home.html\", "
         "\"WiFi Setup\", \"/wifi/wifiSta.html\", "
 #ifdef MQTT
-        "\"MQTT Setup\", \"/mqtt.html\""
+        "\"MQTT Setup\", \"/mqtt.html\", "
 #endif
+        "\"Upgrade Firmware\", \"/flash.html\""
       " ], "
       "\"version\": \"%s\", "
       "\"name\": \"%s\""

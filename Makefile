@@ -181,7 +181,7 @@ SHA     := $(shell if git diff --quiet HEAD; then git rev-parse --short HEAD | c
                    else echo "development"; fi)
 #VERSION ?=esp-link $(BRANCH) - $(DATE) - $(SHA)
 
-VERSION ?=version 10
+VERSION ?= version 11
 
 # Output directors to store intermediate compiled files
 # relative to the project directory
@@ -469,14 +469,15 @@ build/eagle.esphttpd2.v6.ld: $(SDK_LDDIR)/eagle.app.v6.new.1024.app2.ld
 espfs/mkespfsimage/mkespfsimage: espfs/mkespfsimage/
 	$(Q) $(MAKE) -C espfs/mkespfsimage GZIP_COMPRESSION="$(GZIP_COMPRESSION)"
 
+BRANCH ?= master
 release: all
-	$(Q) rm -rf release; mkdir -p release/esp-link-$(BRANCH)
+	$(Q) rm -rf release; mkdir -p release/happy-bubbles-ble
 	$(Q) egrep -a 'esp-link [a-z0-9.]+ - 201' $(FW_BASE)/user1.bin | cut -b 1-80
 	$(Q) egrep -a 'esp-link [a-z0-9.]+ - 201' $(FW_BASE)/user2.bin | cut -b 1-80
 	$(Q) cp $(FW_BASE)/user1.bin $(FW_BASE)/user2.bin $(SDK_BASE)/bin/blank.bin \
-		   "$(SDK_BASE)/bin/boot_v1.5.bin" wiflash release/esp-link-$(BRANCH)
-	$(Q) tar zcf esp-link-$(BRANCH).tgz -C release esp-link-$(BRANCH)
-	$(Q) echo "Release file: esp-link-$(BRANCH).tgz"
+		   "$(SDK_BASE)/bin/boot_v1.5.bin" wiflash release/happy-bubbles-ble
+	$(Q) tar zcf happy-bubbles-ble.tgz -C release happy-bubbles-ble
+	$(Q) echo "Release file: happy-bubbles-ble.tgz"
 	$(Q) rm -rf release
 
 clean:
