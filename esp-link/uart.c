@@ -223,10 +223,9 @@ uart_recvTask(os_event_t *events)
     // read a buffer-full from the uart
     uint16 length = 0;
     char buf[128];
-		memset(buf, 0, 128);
     while ((READ_PERI_REG(UART_STATUS(UART0)) & (UART_RXFIFO_CNT << UART_RXFIFO_CNT_S)) &&
            (length < 128)) {
-			buf[length++] = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
+      buf[length++] = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
     }
     //DBG_UART("%d ix %d\n", system_get_time(), length);
 

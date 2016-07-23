@@ -365,7 +365,7 @@ bleBridgeUartCb(char *buf, short length)
 {
 	//os_printf("********* got serial %d **  %s \n\r", length, buf);
 	// append to serial_buffer
-	strcat(serial_buffer, buf);
+	strncat(serial_buffer, buf, length);
 
 	// check if buffer contains a \n or \r, if does, then is end of string and pass it for processing.
 	char * nl = NULL;
