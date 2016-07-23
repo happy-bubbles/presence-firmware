@@ -8,9 +8,7 @@ function flashFirmware(e) {
 	$("#fw-spinner").removeAttribute("hidden");
   showNotification("Firmware is being updated ...");
 
-	nanoajax.ajax({url: '/flash/upload', method: 'POST', body: fw_data}, function (code, responseText, request) {
-		if(""+code == "200")
-		{
+	ajaxReq("POST", "/flash/upload", function (resp) {
 			ajaxReq("GET", "/flash/reboot", function (resp) {
     		showNotification("Firmware has been successfully updated!");
 				setTimeout(function(){ window.location.reload()}, 4000);
@@ -18,8 +16,7 @@ function flashFirmware(e) {
 				$("#fw-spinner").setAttribute("hidden", "");
 				$("#fw-form").removeAttribute("hidden");
 			});
-		}
-	})
+	}, null, fw_data)
 }
 
 function fetchFlash() {
