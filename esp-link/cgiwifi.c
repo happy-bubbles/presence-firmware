@@ -298,19 +298,8 @@ static ETSTimer resetTimer;
 // the connect succeeds, this gets the module in STA-only mode. If it fails, it ensures
 // that the module is in STA+AP mode so the user has a chance to recover.
 static void ICACHE_FLASH_ATTR resetTimerCb(void *arg) {
-  int x = wifi_station_get_connect_status();
-  int m = wifi_get_opmode() & 0x3;
-  DBG("Wifi check: mode=%s status=%d\n", wifiMode[m], x);
-
-  if(m!=2){
-    if ( x == STATION_GOT_IP ) {
-      if (m != 1) {
-#ifdef CHANGE_TO_STA
-      // We're happily connected, go to STA mode
-			// ONLY DO THIS IF CONFIG IS NOT TRUE!
-			if(!flashConfig.configMode)
+		if(!flashConfig.configMode)
 			{
-	      DBG("Wifi got IP. Going into STA mode..\n");
 	      os_printf("CONFIG MODE IS NOT ENABLED SO STA MODE\n");
   	    wifi_set_opmode(1);
     	  os_timer_arm(&resetTimer, RESET_TIMEOUT, 0); // check one more time after switching to STA-only
@@ -318,22 +307,9 @@ static void ICACHE_FLASH_ATTR resetTimerCb(void *arg) {
 			else 
 			{
 	      os_printf("CONFIG MODE ENABLED SO NOT STA MODE\n");
+				wifi_set_opmode(3);
+				wifi_softap_set_config(&apconf);
 			}
-#endif
-    }
-    log_uart(false);
-    // no more resetTimer at this point, gotta use physical reset to recover if in trouble
- } else {
-   if (m != 3) {
-       DBG("Wifi connect failed. Going into STA+AP mode..\n");
-       wifi_set_opmode(3);
-       wifi_softap_set_config(&apconf);
-    }
-    log_uart(true);
-    DBG("Enabling/continuing uart log\n");
-    os_timer_arm(&resetTimer, RESET_TIMEOUT, 0);
-    }
-  }
 }
 
 // Reassociate timer to delay change of association so the original request can finish
@@ -837,8 +813,8 @@ void ICACHE_FLASH_ATTR wifiInit() {
     // Check te wifi opmode
     int x = wifi_get_opmode() & 0x3;
 
-    // Set opmode to 3 to let system scan aps, otherwise it won't scan
-    wifi_set_opmode(3);
+    // Set opmode to 1 in the beginning
+    wifi_set_opmode(1);
 
     // Call both STATION and SOFTAP default config
     wifi_station_get_config_default(&stconf);
