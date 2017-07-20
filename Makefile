@@ -61,8 +61,10 @@ SDK_BASE	?= $(abspath ../esp_iot_sdk_v1.5.1)
 # Esptool.py path and port, only used for 1-time serial flashing
 # Typically you'll use https://github.com/themadinventor/esptool
 # Windows users use the com port i.e: ESPPORT ?= com3
+#ESPTOOL		?= $(abspath ../esp-open-sdk/esptool/esptool_2.py)
 ESPTOOL		?= $(abspath ../esp-open-sdk/esptool/esptool.py)
-ESPPORT		?= /dev/ttyUSB0
+#ESPPORT		?= /dev/ttyUSB2
+ESPPORT		?= /dev/ttyUSB1
 ESPBAUD		?= 460800
 #ESPBAUD		?= 115200
 #ESPBAUD		?= 9600
@@ -181,7 +183,7 @@ SHA     := $(shell if git diff --quiet HEAD; then git rev-parse --short HEAD | c
                    else echo "development"; fi)
 #VERSION ?=esp-link $(BRANCH) - $(DATE) - $(SHA)
 
-VERSION ?= version 11
+VERSION ?= version 12
 
 # Output directors to store intermediate compiled files
 # relative to the project directory

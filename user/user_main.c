@@ -44,6 +44,13 @@ char beacon_minor [5];
 char tx_power [3];
 char instance_id [13];
 
+typedef struct {
+	uint8_t type;
+	uint8_t start;
+	uint8_t end;
+	uint8_t size;
+} ble_tok_t;
+
 #include "mqtt.h"
 #include "mqtt_client.h"
 extern MQTT_Client mqttClient;
@@ -264,70 +271,120 @@ process_serial(char *buf)
 		//os_printf("=====%s || %s || %s || %s || %s ===DONE\n", ble_mac_addr, ble_rssi, ble_is_scan_resp, ble_type, ble_data);
 		return;
 	}
+
 	//what type of beacon is this?
 	int beacon_type = 99;
-	if(strncmp(ibeacon_include_1, ble_data, strlen(ibeacon_include_1)) == 0 &&
-    strstr(ble_data, ibeacon_include_2) != NULL)
-	{
-		beacon_type = 1; //ibeacon
 
-		//now extract uuid
-    memset(beacon_uuid, 0, 33);
-    memcpy(beacon_uuid, &ble_data[18], 32);
-    beacon_uuid[32] = '\0';
+	// iterate through the beacon data, but easier if it is bytes
+	uint8_t adv_bytes[strlen(ble_data)/2];
 
-    //extract minor
-    memset(beacon_minor, 0, 5);
-    memcpy(beacon_minor, &ble_data[54], 4);
-    beacon_minor[5] = '\0';
- 
-    //extract major
-    memset(beacon_major, 0, 5);
-    memcpy(beacon_major, &ble_data[50], 4);
-    beacon_major[5] = '\0';
-       
-    //extract tx_power
-    memset(tx_power, 0, 3);
-    memcpy(tx_power, &ble_data[58], 2);
-    tx_power[3] = '\0';
-		
-	//os_printf("^^^^^ ibeacon %s %s %s %s\n", beacon_uuid, beacon_major, beacon_minor, tx_power);
+	for(int i=0; i<(strlen(ble_data)/2); i++) {
+		uint8_t d1 = 0;
+
+		if(ble_data[i*2] > '9') {
+			d1 += ((ble_data[i*2] - 'a' + 10) * 0x10);
+		}
+		else {
+			d1 += ((ble_data[i*2] - '0') * 0x10);
+		}
+
+		if(ble_data[i*2+1] > '9') {
+			d1 += ble_data[i*2+1] - 'a' + 10;
+		}
+		else {
+			d1 += ble_data[i*2+1] - '0';
+		}
+
+		adv_bytes[i] = d1;
+	}
+
+	// start with 6 tokens
+	ble_tok_t tokens[6];
+
+	uint8_t token_i = 0;
+	int stop = 0;
+	int pos = 0;
+	while(!stop) {
+		tokens[token_i].size = adv_bytes[pos];
+		tokens[token_i].type = adv_bytes[pos+1];
+		tokens[token_i].start = pos+2;
+		tokens[token_i].end = pos+tokens[token_i].size;
+
+/*
+		printf("tok: %d, size: %02hhx, type: %02hhx, start: %d end: %d\n", token_i, tokens[token_i].size, tokens[token_i].type, tokens[token_i].start, tokens[token_i].end);
+		for(int j=tokens[token_i].start; j<=tokens[token_i].end; j++) {
+			printf("%02hhx", adv_bytes[j]);
+		}
+		printf("\n\n");
+*/
+		pos = tokens[token_i].end + 1;
+		if(pos >= sizeof(adv_bytes)) {
+			stop = 1;
+		}
+		token_i++;
+	}
+
+	// iterate through the tokens and determine what kind of beacon it is
+	for(int i = 0; i <= token_i; i++) {
+		// is Eddystone?
+		if(tokens[i].type == 0x16 
+				&& adv_bytes[tokens[i].start] == 0xaa 
+				&& adv_bytes[tokens[i].start+1] == 0xfe
+				&& adv_bytes[tokens[i].start+2] == 0x00) {
+
+			beacon_type = 0; //eddystone UID
+
+			//https://github.com/google/eddystone/tree/master/eddystone-uid
+			memset(tx_power, 0, 3);
+			memcpy(tx_power, &ble_data[(tokens[i].start+3)*2], 2);
+			tx_power[3] = '\0';
+
+			//now extract instance_id
+			memset(instance_id, 0, 13);
+			memcpy(instance_id, &ble_data[(tokens[i].start+14)*2], 12);
+			instance_id[13] = '\0';
+
+			//now extract UUID
+			memset(beacon_uuid, 0, 33);
+			memcpy(beacon_uuid, &ble_data[(tokens[i].start+4)*2], 20);
+			beacon_uuid[32] = '\0';
+
+			break;
+		}
+
+		// is iBeacon?
+		if(tokens[i].type == 0xff
+				&& adv_bytes[tokens[i].start] == 0x4c
+				&& adv_bytes[tokens[i].start+1] == 0x00
+				&& adv_bytes[tokens[i].start+2] == 0x02
+				&& adv_bytes[tokens[i].start+3] == 0x15) {
+
+			beacon_type = 1; //ibeacon
+
+			//now extract uuid
+			memset(beacon_uuid, 0, 33);
+			memcpy(beacon_uuid, &ble_data[(tokens[i].start+4)*2], 32);
+			beacon_uuid[32] = '\0';
+
+			//extract major
+			memset(beacon_major, 0, 5);
+			memcpy(beacon_major, &ble_data[(tokens[i].start+20)*2], 4);
+			beacon_major[4] = '\0';
+
+			//extract minor
+			memset(beacon_minor, 0, 5);
+			memcpy(beacon_minor, &ble_data[(tokens[i].start+22)*2], 4);
+			beacon_minor[4] = '\0';
+
+			//extract tx_power
+			memset(tx_power, 0, 3);
+			memcpy(tx_power, &ble_data[(tokens[i].start+24)*2], 2);
+			tx_power[3] = '\0';
+
+			os_printf("^^^^^ ibeacon %s %s %s %s\n", beacon_uuid, beacon_major, beacon_minor, tx_power);
+		}
 	}
 	
-	else if(ble_data[10] == 'a' &&
-    ble_data[11] == 'a' &&
-    ble_data[12] == 'f' &&
-    ble_data[13] == 'e' &&
-
-    ble_data[18] == 'a' &&
-    ble_data[19] == 'a' &&
-    ble_data[20] == 'f' &&
-    ble_data[21] == 'e' &&
-    
-    //this is data type for UID per https://github.com/google/eddystone/blob/master/protocol-specification.md
-    ble_data[22] == '0' &&
-    ble_data[23] == '0' 
-    )
-  {
-    beacon_type = 0; //eddystone
-
-    //now extract instance_id
-    memset(instance_id, 0, 13);
-    memcpy(instance_id, &ble_data[46], 12);
-    instance_id[13] = '\0';
-
-    //now extract UUID
-    memset(beacon_uuid, 0, 33);
-    memcpy(beacon_uuid, &ble_data[26], 20);
-    beacon_uuid[32] = '\0';
-
-		//TODO: extract calibrated TX power
-		//https://github.com/google/eddystone/tree/master/eddystone-uid
-    memset(tx_power, 0, 3);
-    memcpy(tx_power, &ble_data[24], 2);
-    tx_power[3] = '\0';
-  }
-
 	//add some filters to
 	if(beacon_type == 0) 
 	{
@@ -430,22 +487,30 @@ void app_init() {
   os_printf("initializing MQTT");
   mqtt_client_init();
 
-	//purplse
-	set_led(155, 0, 155, 0);
-	sleepms(100);
-	set_led(0, 0, 0, 0);
-	sleepms(100);
-	set_led(155, 0, 155, 0);
-	sleepms(100);
-	set_led(0, 0, 0, 0);
-	sleepms(100);
-	set_led(155, 0, 155, 0);
-	sleepms(100);
-	set_led(0, 0, 0, 0);
-	sleepms(100);
-	set_led(155, 0, 155, 0);
-	sleepms(100);
-	set_led(0, 0, 0, 0);
+	struct rst_info *rst_info = system_get_rst_info();
+	if(rst_info->reason == 3)
+	{
+		//WDT reset so don't blink purplse
+	}
+	else
+	{
+		//purplse
+		set_led(155, 0, 155, 0);
+		sleepms(100);
+		set_led(0, 0, 0, 0);
+		sleepms(100);
+		set_led(155, 0, 155, 0);
+		sleepms(100);
+		set_led(0, 0, 0, 0);
+		sleepms(100);
+		set_led(155, 0, 155, 0);
+		sleepms(100);
+		set_led(0, 0, 0, 0);
+		sleepms(100);
+		set_led(155, 0, 155, 0);
+		sleepms(100);
+		set_led(0, 0, 0, 0);
+	}
 
 	//MQTT Timer 
 	os_timer_disarm(&mqtt_timer);

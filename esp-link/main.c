@@ -237,6 +237,5 @@ void user_init(void) {
 	{
 		NOTICE("INITIALIZING USER APPLICATION");
 	  app_init();
-
 	}
 }
