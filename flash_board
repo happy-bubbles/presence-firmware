@@ -1,6 +1,8 @@
 ./ble_module/flash  </dev/null
 X=$?
 
+USB=/dev/ttyUSB1
+
 if [ "$X" -ne "0" ] 
 then
 	echo "BAD NRF FLASH"
@@ -9,5 +11,11 @@ fi
 
 read -p "Reset ESP8266 into bootloader mode, then press any key..." 
 
-#../esp-open-sdk/esptool/esptool.py --port /dev/ttyUSB0 erase_flash
+#../esp-open-sdk/esptool/esptool.py --port $USB erase_flash
+sleep 1
 make flash
+OK=$?
+if [ "$OK" -ne "0" ]
+then
+	make flash
+fi

@@ -1,5 +1,4 @@
-/* 
- * Copyright (c) 2016 Nemik Consulting Inc
+/* Copyright (c) 2016 Nemik Consulting Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +29,11 @@ InterruptIn esp_reset (p29);
 
 void advertisementCallback(const Gap::AdvertisementCallbackParams_t *params) 
 {
+    if(!pc.writeable())
+    {
+        return;
+    }
+    
     pc.printf("|%02x%02x%02x%02x%02x%02x|", 
         params->peerAddr[5], params->peerAddr[4], params->peerAddr[3], params->peerAddr[2], params->peerAddr[1], params->peerAddr[0]);
  
@@ -42,7 +46,7 @@ void advertisementCallback(const Gap::AdvertisementCallbackParams_t *params)
         //sprintf(data_tmp+2*index, "%02x", params->advertisingData[index]);
         pc.printf("%02x", params->advertisingData[index]);
     }
-    pc.printf("|\n");
+    pc.printf("|\n\r");
 }
 
 /**
@@ -73,6 +77,7 @@ void bleInitComplete(BLE::InitializationCompleteCallbackContext *params)
     }
  
     //ble.gap().setScanParams(100 /* scan interval */, 100 /* scan window */);
+    //ble.gap().setActiveScanning(true);
     ble.gap().setScanParams(50 /* scan interval */, 50 /* scan window */, 0 /* no timeout */, true /*active scanning*/);
     
     ble.gap().startScan(advertisementCallback);
@@ -92,9 +97,12 @@ void serial_init(void)
     
     if(enable == 0 && !serial_enabled)
     {
+        //Serial pc(p8, p9); //dev
         Serial pc(p9, p8); //prod
         pc.baud (115200);
+        //pc.baud(38400);
         serial_enabled = true;
+        //pc.printf("SERIAL START\n");
     }
     else
     {
@@ -118,7 +126,7 @@ int main(void)
 
     while (true) 
     {
-        ble.waitForEvent();
+        //ble.waitForEvent();
     }
 }
 
