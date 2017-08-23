@@ -1,3 +1,11 @@
 cd ble_module
 #openocd -d1 -f x.cfg  -c "gdb_port pipe; init; halt; nrf51 mass_erase; reset; halt; flash write_image erase combined.hex 0; verify_image combined.hex 0; reset; exit;"
-openocd -d1 -f x.cfg  -c "gdb_port pipe; init; halt; nrf51 mass_erase; reset; halt; flash write_image erase ble_scanner_cr.hex 0; verify_image ble_scanner_cr.hex 0; reset; exit;"
+
+#THIS IS ORIG
+#openocd -d1 -f x.cfg  -c "gdb_port pipe; init; halt; nrf51 mass_erase; reset; halt; flash write_image erase ble_scanner_cr.hex 0; verify_image ble_scanner_cr.hex 0; reset; exit;"
+
+
+#openocd -d1 -f x.cfg  -c "gdb_port pipe; init; halt; nrf51 mass_erase; reset; halt; flash write_image erase ble_scanner_wdt.hex 0; verify_image ble_scanner_wdt.hex 0; reset; exit;"
+
+# V2 with serial fix
+openocd -d1 -f x.cfg  -c "gdb_port pipe; init; halt; nrf51 mass_erase; reset; halt; flash write_image erase ble_scanner_2.hex 0; verify_image ble_scanner_2.hex 0; reset; exit;"
