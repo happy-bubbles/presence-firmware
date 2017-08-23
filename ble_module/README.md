@@ -2,6 +2,11 @@
 
 The Bluetooth Low Energy module on the Happy Bubbles detectors is a the Xuntong PTR5518, based on the Nordic nRF51822 chipset. It can run any firmware written for that Nordic BLE chip. The firmware on it currently scans for BLE advertisements and sends them over a 115200 baud UART/serial line to the ESP8266.
 
+## Building
+
+The firmware relies on the mBed library: https://developer.mbed.org/
+
+The `main.cpp` is basically the whole firmware and can just be copied to an mBed project targetting the nRF51 chip to produce a hex file. The HRM1017 one is recommended because it uses the same clock source as the Xuntong module.
 
 ## Flashing
 
