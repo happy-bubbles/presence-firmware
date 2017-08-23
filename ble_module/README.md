@@ -21,7 +21,7 @@ These instructions are designed for a Raspberry Pi v3 running Raspbian, with an 
 
 ```
 sudo apt-get update
-sudo apt-get install git autoconf libtool make pkg-config libusb-1.0-0 libusb-1.0-0-dev srecord tmux npm vim
+sudo apt-get install git autoconf libtool make pkg-config libusb-1.0-0 libusb-1.0-0-dev srecord
 cd ~
 mkdir code
 cd code
