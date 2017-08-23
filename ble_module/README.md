@@ -11,7 +11,7 @@ There are two ways to flash the BLE module. The easiest is by using a Tag-Connec
 
 The second is by soldering to the SWD pins on the PTR5518 module. For this, 3 wires are needed: ground, SWDIO, and SWCLK.
 
-![Alt text](/ble_module/ble_flashing.jpg?raw=true "SWD")
+![Alt text](/ble_module/ble_flashing.png?raw=true "SWD")
 
 ### Software
 
