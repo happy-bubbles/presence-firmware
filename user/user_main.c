@@ -394,6 +394,10 @@ process_serial(char *buf)
 		{
 			set_led(0, 0, 55, 130);
 		}
+		else
+		{
+			set_led(0, 0, 0, 0);
+		}
 	}
 	else if(beacon_type == 1) 
 	{
@@ -403,12 +407,20 @@ process_serial(char *buf)
 		{
 			set_led(0, 55, 0, 130);
 		}
+		else
+		{
+			set_led(0, 0, 0, 0);
+		}
 	}
 	else
 	{
 		if(flashConfig.led_output)
 		{
 			set_led(55, 0, 0, 130);
+		}
+		else
+		{
+			set_led(0, 0, 0, 0);
 		}
 	}
 
@@ -511,6 +523,7 @@ void app_init() {
 		sleepms(100);
 		set_led(0, 0, 0, 0);
 	}
+	set_led(0, 0, 0, 0);
 
 	//MQTT Timer 
 	os_timer_disarm(&mqtt_timer);

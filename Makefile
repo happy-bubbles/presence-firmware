@@ -64,7 +64,8 @@ SDK_BASE	?= $(abspath ../esp_iot_sdk_v1.5.1)
 #ESPTOOL		?= $(abspath ../esp-open-sdk/esptool/esptool_2.py)
 ESPTOOL		?= $(abspath ../esp-open-sdk/esptool/esptool.py)
 #ESPPORT		?= /dev/ttyUSB2
-ESPPORT		?= /dev/ttyUSB1
+#ESPPORT		?= /dev/ttyUSB1
+ESPPORT		?= /dev/ttyUSB0
 ESPBAUD		?= 460800
 #ESPBAUD		?= 115200
 #ESPBAUD		?= 9600
@@ -183,7 +184,7 @@ SHA     := $(shell if git diff --quiet HEAD; then git rev-parse --short HEAD | c
                    else echo "development"; fi)
 #VERSION ?=esp-link $(BRANCH) - $(DATE) - $(SHA)
 
-VERSION ?= version 12
+VERSION ?= version 13
 
 # Output directors to store intermediate compiled files
 # relative to the project directory
