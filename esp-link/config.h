@@ -39,6 +39,7 @@ typedef struct {
   int8_t   timezone_offset;
 	bool		 configMode;
 	bool		 led_output;
+	bool		 total_led_off;
 } FlashConfig;
 extern FlashConfig flashConfig;
 

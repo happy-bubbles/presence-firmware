@@ -184,7 +184,7 @@ SHA     := $(shell if git diff --quiet HEAD; then git rev-parse --short HEAD | c
                    else echo "development"; fi)
 #VERSION ?=esp-link $(BRANCH) - $(DATE) - $(SHA)
 
-VERSION ?= version 13
+VERSION ?= version 15
 
 # Output directors to store intermediate compiled files
 # relative to the project directory

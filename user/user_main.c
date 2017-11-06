@@ -70,6 +70,10 @@ uint32_t atoint32(char *instr)
 extern void mqtt_client_init(void);
 static void ICACHE_FLASH_ATTR mqtt_check(void *args) 
 {
+	if(flashConfig.total_led_off)
+	{
+	  set_led(0, 0, 0, 0);
+	}
   if (mqttClient.connState != MQTT_CONNECTED)
 	{
 		os_printf("====================== MQTT BAD, restarting\r\n");
@@ -390,7 +394,7 @@ process_serial(char *buf)
 	{
 		//os_printf("send some mqtt for eddystone %s ========\n", beacon_uuid);
 		sendMQTTeddystone(ble_mac_addr, beacon_uuid, instance_id, tx_power, ble_rssi);
-		if(flashConfig.led_output)
+		if(flashConfig.led_output && !flashConfig.total_led_off)
 		{
 			set_led(0, 0, 55, 130);
 		}
@@ -403,7 +407,7 @@ process_serial(char *buf)
 	{
 		//os_printf("send some mqtt for ibeacon %s ========\n", beacon_uuid);
 		sendMQTTibeacon(ble_mac_addr, beacon_uuid, beacon_major, beacon_minor, tx_power, ble_rssi);
-		if(flashConfig.led_output)
+		if(flashConfig.led_output && !flashConfig.total_led_off)
 		{
 			set_led(0, 55, 0, 130);
 		}
@@ -414,7 +418,7 @@ process_serial(char *buf)
 	}
 	else
 	{
-		if(flashConfig.led_output)
+		if(flashConfig.led_output && !flashConfig.total_led_off)
 		{
 			set_led(55, 0, 0, 130);
 		}
@@ -500,9 +504,10 @@ void app_init() {
   mqtt_client_init();
 
 	struct rst_info *rst_info = system_get_rst_info();
-	if(rst_info->reason == 3)
+	if(rst_info->reason == 3 || flashConfig.total_led_off)
 	{
 		//WDT reset so don't blink purplse
+	  set_led(0, 0, 0, 0);
 	}
 	else
 	{

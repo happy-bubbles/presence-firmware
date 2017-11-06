@@ -52,6 +52,7 @@ int ICACHE_FLASH_ATTR cgiMqttGet(HttpdConnData *connData) {
       "\"mqtt-status-enable\":%d, "
       "\"mqtt-clean-session\":%d, "
       "\"led_output\":%d, "
+      "\"total_led_off\":%d, "
       "\"mqtt-port\":%d, "
       "\"mqtt-timeout\":%d, "
       "\"mqtt-keepalive\":%d, "
@@ -64,6 +65,7 @@ int ICACHE_FLASH_ATTR cgiMqttGet(HttpdConnData *connData) {
       mqtt_states[mqttClient.connState], flashConfig.mqtt_status_enable,
       flashConfig.mqtt_clean_session, 
       flashConfig.led_output, 
+      flashConfig.total_led_off, 
 			flashConfig.mqtt_port,
       flashConfig.mqtt_timeout, flashConfig.mqtt_keepalive,
       flashConfig.mqtt_host, flashConfig.mqtt_clientid,
@@ -100,6 +102,10 @@ int ICACHE_FLASH_ATTR cgiMqttSet(HttpdConnData *connData) {
 	if (mqtt_server < 0) return HTTPD_CGI_DONE;
   mqtt_server |= getBoolArg(connData, "led_output",
       &flashConfig.led_output);
+	
+	if (mqtt_server < 0) return HTTPD_CGI_DONE;
+  mqtt_server |= getBoolArg(connData, "total_led_off",
+      &flashConfig.total_led_off);
 
 	/*
   if (mqtt_server < 0) return HTTPD_CGI_DONE;
@@ -139,6 +145,11 @@ int ICACHE_FLASH_ATTR cgiMqttSet(HttpdConnData *connData) {
     flashConfig.led_output = led_out;
   }
 
+	// handle total_led_off
+  if (httpdFindArg(connData->getArgs, "total_led_off", buff, sizeof(buff)) > 0) {
+    int32_t total_led_off = atoi(buff);
+    flashConfig.total_led_off = total_led_off;
+  }
 
   // if server setting changed, we need to "make it so"
   if (mqtt_server) {
